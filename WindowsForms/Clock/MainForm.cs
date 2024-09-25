@@ -19,6 +19,8 @@ namespace Clock
 		bool controlsVisible;
 		public System.Windows.Forms.Label LabelTime { get => labelTime; }
 		ChooseFont chooseFontDialog;
+		AlarmDialog alarmDialog;
+		public DateTime alarTime { get; set; }
 		public MainForm()
 		{
 			InitializeComponent();
@@ -36,13 +38,17 @@ namespace Clock
 			AllocConsole();
 			CreateCustomFont();
 
+
 			chooseFontDialog = new ChooseFont(this);
+			alarmDialog = new AlarmDialog(this);
+			
+			
 		}
 		void CreateCustomFont()
 		{
 			Console.WriteLine(Directory.GetCurrentDirectory());
 			Directory.SetCurrentDirectory("..\\..\\Fonts");
-			Console.WriteLine(Directory.GetCurrentDirectory());
+			//Console.WriteLine(Directory.GetCurrentDirectory());
 
 			PrivateFontCollection pfc = new PrivateFontCollection();
 			pfc.AddFontFile("Terminat.ttf");
@@ -55,9 +61,16 @@ namespace Clock
 		{
 			labelTime.Text = DateTime.Now.ToString("hh:mm:ss tt");
 			if (cbShowDate.Checked) labelTime.Text += $"\n{DateTime.Now.ToString("yyyy.MM.dd")}";
-		}
 
-		private void btnHideControls_Click(object sender, EventArgs e)
+            //alarm 
+            //Wake the fuck up, Samurai! We have a city to burn!
+            if (alarTime.ToString("hh:mm:ss tt") == labelTime.Text)
+            {
+                MessageBox.Show("Wake the fuck up, Samurai!\t\n We have a city to burn!");
+            }
+        }
+
+        private void btnHideControls_Click(object sender, EventArgs e)
 		{
 			SetControlsVisibility(false);
 		}
@@ -163,5 +176,11 @@ namespace Clock
 			topmostToolStripMenuItem.Checked = cbPin.Checked;
 			cbPin.BackgroundImage = cbPin.Checked ? Properties.Resources.pinned.ToBitmap() : Properties.Resources.note_thepin.ToBitmap();
 		}
-	}
+
+        private void alarmToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			alarmDialog.ShowDialog();
+
+        }
+    }
 }

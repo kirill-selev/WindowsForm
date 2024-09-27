@@ -11,6 +11,8 @@ using System.Drawing.Text;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Threading;
+using AxWMPLib;
+using WMPLib;
 
 namespace Clock
 {
@@ -20,7 +22,10 @@ namespace Clock
 		public System.Windows.Forms.Label LabelTime { get => labelTime; }
 		ChooseFont chooseFontDialog;
 		AlarmDialog alarmDialog;
-		public DateTime alarTime { get; set; }
+        public string AlarmFile { get; set; }
+        public DateTime AlarmTime { get; set; }
+        public System.Windows.Forms.NotifyIcon NotifyIcon { get => notifyIconSystemTray; }
+        public DateTime alarTime { get; set; }
 		public MainForm()
 		{
 			InitializeComponent();
@@ -59,15 +64,23 @@ namespace Clock
 
 		private void timer1_Tick(object sender, EventArgs e)
 		{
-			labelTime.Text = DateTime.Now.ToString("hh:mm:ss tt");
-			if (cbShowDate.Checked) labelTime.Text += $"\n{DateTime.Now.ToString("yyyy.MM.dd")}";
+			const string TIME_FORMAT = "hh:mm: ss tt";
+            const string DATE_FORMAT = "yyyy.MM.dd";
 
-            //alarm 
-            //Wake the fuck up, Samurai! We have a city to burn!
-            if (alarTime.ToString("hh:mm:ss tt") == labelTime.Text)
+            labelTime.Text = DateTime.Now.ToString(TIME_FORMAT);
+			if (cbShowDate.Checked) labelTime.Text += $"\n{DateTime.Now.ToString("DATE_FORMAT")}";
+
+            DateTime currentTime = new DateTime(DateTime.Now.Ticks - DateTime.Now.Ticks % TimeSpan.TicksPerSecond);
+            Console.WriteLine($"{AlarmTime}\t{currentTime}");
+            if (AlarmTime.Equals(currentTime))
             {
                 MessageBox.Show("Wake the fuck up, Samurai!\t\n We have a city to burn!");
+                axWindowsMediaPlayer1.URL = AlarmFile;
+                axWindowsMediaPlayer1.Ctlcontrols.play();
             }
+           
+  
+			
         }
 
         private void btnHideControls_Click(object sender, EventArgs e)
@@ -86,7 +99,8 @@ namespace Clock
 			showControlsToolStripMenuItem.Checked = visible;
 			this.controlsVisible = visible;
 			cbPin.Visible = visible;
-		}
+            axWindowsMediaPlayer1.Visible = visible;
+        }
 
 		private void quitToolStripMenuItem_Click(object sender, EventArgs e)
 		{
